@@ -291,6 +291,7 @@ export default function AdminPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="python">Python</SelectItem>
+                          <SelectItem value="matlab">MATLAB</SelectItem>
                           <SelectItem value="javascript">JavaScript</SelectItem>
                           <SelectItem value="typescript">TypeScript</SelectItem>
                           <SelectItem value="jsx">JSX</SelectItem>
