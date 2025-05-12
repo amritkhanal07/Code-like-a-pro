@@ -4,16 +4,19 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import DriveSync from "@/components/drive-sync"
+import FirebaseSync from "@/components/firebase-sync"
 import { Trash2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import GoogleDriveSetup from "@/components/google-drive-setup"
-import ApiCredentials from "@/components/api-credentials"
+import FirebaseSetup from "@/components/firebase-setup"
+import FirebaseCredentials from "@/components/firebase-credentials"
+import { useSearchParams } from "next/navigation"
 
 export default function SettingsPage() {
   const { toast } = useToast()
   const [clearingData, setClearingData] = useState(false)
+  const searchParams = useSearchParams()
+  const defaultTab = searchParams.get("tab") || "storage"
 
   const handleClearLocalData = () => {
     if (window.confirm("Are you sure you want to clear all local data? This cannot be undone.")) {
@@ -46,15 +49,15 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Manage your blog settings and data storage options.</p>
       </div>
 
-      <Tabs defaultValue="storage">
+      <Tabs defaultValue={defaultTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="storage">Storage</TabsTrigger>
-          <TabsTrigger value="credentials">API Credentials</TabsTrigger>
-          <TabsTrigger value="setup">Google Drive Setup</TabsTrigger>
+          <TabsTrigger value="credentials">Firebase Config</TabsTrigger>
+          <TabsTrigger value="setup">Firebase Setup</TabsTrigger>
         </TabsList>
 
         <TabsContent value="storage" className="space-y-6 mt-6">
-          <DriveSync />
+          <FirebaseSync />
 
           <Card>
             <CardHeader>
@@ -67,7 +70,7 @@ export default function SettingsPage() {
                   <AlertTitle>Warning</AlertTitle>
                   <AlertDescription>
                     Clearing local data will remove all posts stored in your browser. Make sure you have exported your
-                    posts or connected to Google Drive before proceeding.
+                    posts or connected to Firebase before proceeding.
                   </AlertDescription>
                 </Alert>
                 <Button variant="destructive" onClick={handleClearLocalData} disabled={clearingData} className="w-full">
@@ -80,11 +83,11 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="credentials" className="space-y-6 mt-6">
-          <ApiCredentials />
+          <FirebaseCredentials />
         </TabsContent>
 
         <TabsContent value="setup" className="space-y-6 mt-6">
-          <GoogleDriveSetup />
+          <FirebaseSetup />
         </TabsContent>
       </Tabs>
     </div>

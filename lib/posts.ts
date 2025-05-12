@@ -1,5 +1,5 @@
-// Updated posts library with Google Drive integration
-import { loadFromDrive, saveToDrive, isSignedIn, isDriveAvailable } from "./drive-storage"
+// Updated posts library with Firebase integration
+import { loadPostsFromFirebase, savePostsToFirebase, isAuthenticated } from "./firebase"
 
 export interface PostSection {
   type: "text" | "code"
@@ -69,7 +69,7 @@ export default function About() {
 // In-memory cache of posts
 let postsCache: Post[] | null = null
 
-// Load posts from storage (Drive or localStorage)
+// Load posts from storage (Firebase or localStorage)
 export const loadPosts = async (): Promise<Post[]> => {
   // Return cached posts if available
   if (postsCache) {
@@ -77,16 +77,16 @@ export const loadPosts = async (): Promise<Post[]> => {
   }
 
   try {
-    // Try to load from Google Drive first if available and signed in
-    if (typeof window !== "undefined" && isDriveAvailable() && isSignedIn()) {
-      const drivePosts = await loadFromDrive()
-      if (drivePosts && drivePosts.length > 0) {
-        postsCache = drivePosts
-        return drivePosts
+    // Try to load from Firebase first if authenticated
+    if (typeof window !== "undefined" && isAuthenticated()) {
+      const firebasePosts = await loadPostsFromFirebase()
+      if (firebasePosts && firebasePosts.length > 0) {
+        postsCache = firebasePosts
+        return firebasePosts
       }
     }
 
-    // Fall back to localStorage if Drive fails or user is not signed in
+    // Fall back to localStorage if Firebase fails or user is not authenticated
     if (typeof window !== "undefined") {
       const savedPosts = localStorage.getItem("blog_posts")
       if (savedPosts) {
@@ -109,7 +109,7 @@ export const loadPosts = async (): Promise<Post[]> => {
   }
 }
 
-// Save posts to storage (Drive and localStorage)
+// Save posts to storage (Firebase and localStorage)
 export const savePosts = async (posts: Post[]): Promise<void> => {
   if (typeof window === "undefined") return
 
@@ -120,9 +120,9 @@ export const savePosts = async (posts: Post[]): Promise<void> => {
     // Save to localStorage as backup
     localStorage.setItem("blog_posts", JSON.stringify(posts))
 
-    // Save to Google Drive if available and signed in
-    if (isDriveAvailable() && isSignedIn()) {
-      await saveToDrive(posts)
+    // Save to Firebase if authenticated
+    if (isAuthenticated()) {
+      await savePostsToFirebase(posts)
     }
   } catch (error) {
     console.error("Error saving posts:", error)
